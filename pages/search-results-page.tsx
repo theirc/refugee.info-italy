@@ -8,10 +8,14 @@ import {
   CategoryWithSections,
   ZendeskCategory,
 } from '@ircsignpost/signpost-base/dist/src/zendesk';
+import {
+  getCategories,
+  getCategoriesWithSections,
+  getTranslationsFromDynamicContent,
+} from '@ircsignpost/signpost-base/dist/src/zendesk';
 import { GetStaticProps } from 'next';
 
 import {
-  ABOUT_US_ARTICLE_ID,
   CATEGORIES_TO_HIDE,
   CATEGORY_ICON_NAMES,
   GOOGLE_ANALYTICS_IDS,
@@ -38,14 +42,7 @@ import {
   populateMenuOverlayStrings,
   populateSearchResultsPageStrings,
 } from '../lib/translations';
-import { getSiteUrl, getZendeskMappedUrl, getZendeskUrl } from '../lib/url';
-// TODO: import methods from '@ircsignpost/signpost-base/dist/src/zendesk' instead.
-import {
-  getArticle,
-  getCategories,
-  getCategoriesWithSections,
-  getTranslationsFromDynamicContent,
-} from '../lib/zendesk-fake';
+import { getSiteUrl, getZendeskUrl } from '../lib/url';
 
 interface SearchResultsPageProps {
   currentLocale: Locale;
@@ -80,6 +77,7 @@ export default function SearchResultsPage({
       headerLogoProps={getHeaderLogoProps(currentLocale)}
       strings={strings}
       siteUrl={siteUrl}
+      informationFilter={[5388318703383]}
       cookieBanner={
         <CookieBanner
           strings={populateCookieBannerStrings(dynamicContent)}
@@ -120,18 +118,9 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
     );
   }
 
-  const aboutUsArticle = await getArticle(
-    currentLocale,
-    ABOUT_US_ARTICLE_ID,
-    getZendeskUrl(),
-    getZendeskMappedUrl(),
-    ZENDESK_AUTH_HEADER
-  );
-
   const menuOverlayItems = getMenuItems(
     populateMenuOverlayStrings(dynamicContent),
-    categories,
-    !!aboutUsArticle
+    categories
   );
 
   const strings = populateSearchResultsPageStrings(dynamicContent);
