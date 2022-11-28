@@ -50,6 +50,8 @@ export const HOME_PAGE_DYNAMIC_CONTENT_PLACEHOLDERS = [
   'default_banner_whatsapp_title',
   'ri_italy_whatsapp_link',
   'default_banner_link_share_title',
+  'default_banner_telegram_title',
+  'ri_italy_telegram_link',
   // Main body strings.
   'default_information_title',
   'ri_italy_information_description',
@@ -105,6 +107,10 @@ export function populateSocialMediaLinks(dynamicContent: {
     messengerLink: {
       title: dynamicContent['default_banner_messenger_title'],
       href: dynamicContent['ri_italy_messenger_link'],
+    },
+    telegramLink: {
+      title: dynamicContent['default_banner_telegram_title'],
+      href: dynamicContent['ri_italy_telegram_link'],
     },
   };
 }
