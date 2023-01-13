@@ -37,6 +37,9 @@ export const COMMON_DYNAMIC_CONTENT_PLACEHOLDERS = [
   'default_banner_facebook_title',
   'default_banner_whatsapp_title',
   'default_banner_link_share_title',
+  'default_filter_label',
+  'default_most_recent_filter_option',
+  'default_most_popular_filter_option',
 ];
 
 export const HOME_PAGE_DYNAMIC_CONTENT_PLACEHOLDERS = [
@@ -257,6 +260,16 @@ export function populateHomePageStrings(dynamicContent: {
     cookieBannerStrings: populateCookieBannerStrings(dynamicContent),
     serviceMapStrings: populateServiceMapStrings(dynamicContent),
     searchBarStrings: populateSearchBarStrings(dynamicContent),
+  };
+}
+
+export function populateFilterSelectStrings(dynamicContent: {
+  [key: string]: string;
+}) {
+  return {
+    filterLabel: dynamicContent['default_filter_label'],
+    mostRecent: dynamicContent['default_most_recent_filter_option'],
+    mostPopular: dynamicContent['default_most_popular_filter_option'],
   };
 }
 
