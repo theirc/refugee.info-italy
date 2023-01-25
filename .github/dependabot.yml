@@ -6,5 +6,4 @@ updates:
       interval: 'daily'
     allow:
       - dependency-name: '@ircsignpost/signpost-base'
-    reviewers:
-      - 'guiso92'
+
