@@ -76,7 +76,10 @@ export const HOME_PAGE_DYNAMIC_CONTENT_PLACEHOLDERS = [
   'default_service_map_my_location_option',
 ];
 
-export const CATEGORY_PLACEHOLDERS = ['default_select_topic'];
+export const CATEGORY_PLACEHOLDERS = [
+  'default_select_topic',
+  'default_select_subtopic',
+];
 
 export const SECTION_PLACEHOLDERS = ['default_select_topic'];
 
@@ -288,6 +291,7 @@ export function populateCategoryStrings(dynamicContent: {
     cookieBannerStrings: populateCookieBannerStrings(dynamicContent),
     selectTopicLabel: getSelectTopicLabel(dynamicContent),
     searchBarStrings: populateSearchBarStrings(dynamicContent),
+    selectSubTopicLabel: dynamicContent['default_select_subtopic'],
   };
 }
 
