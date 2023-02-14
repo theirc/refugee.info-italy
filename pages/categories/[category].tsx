@@ -33,7 +33,7 @@ import {
   getZendeskLocaleId,
 } from '../../lib/locale';
 import { getHeaderLogoProps } from '../../lib/logo';
-import { getMenuItems } from '../../lib/menu';
+import { getFooterItems, getMenuItems } from '../../lib/menu';
 import {
   CATEGORY_PLACEHOLDERS,
   COMMON_DYNAMIC_CONTENT_PLACEHOLDERS,
@@ -58,6 +58,7 @@ interface CategoryProps {
   sectionFilterItems: MenuItem[];
   sectionId: number;
   dynamicContent: { [key: string]: string };
+  footerLinks?: MenuOverlayItem[];
 }
 
 export default function Category({
@@ -73,6 +74,7 @@ export default function Category({
   sectionFilterItems,
   sectionId,
   dynamicContent,
+  footerLinks,
 }: CategoryProps) {
   const [sectionDisplayed, setSectionDisplayed] = useState<Section>(section);
   const [selectedSectionId, setSelectedSectionId] = useState<number>(sectionId);
@@ -135,6 +137,7 @@ export default function Category({
       sectionFilterItems={sectionFilterItems}
       onSectionFilterChange={handleSectionFilterChange}
       sectionId={selectedSectionId}
+      footerLinks={footerLinks}
     />
   );
 }
@@ -225,6 +228,11 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
     categories
   );
 
+  const footerLinks = getFooterItems(
+    populateMenuOverlayStrings(dynamicContent),
+    categories
+  );
+
   const sections = await getSectionsForCategory(
     currentLocale,
     Number(params?.category),
@@ -275,6 +283,7 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
       sectionFilterItems,
       dynamicContent,
       sectionId,
+      footerLinks,
     },
     revalidate: REVALIDATION_TIMEOUT_SECONDS,
   };
