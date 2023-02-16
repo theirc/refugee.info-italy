@@ -6,6 +6,7 @@ import {
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ZENDESK_AUTH_HEADER } from '../../lib/constants';
+import { LOCALES } from '../../lib/locale';
 import { getZendeskUrl } from '../../lib/url';
 
 export default async function handler(
@@ -19,7 +20,7 @@ export default async function handler(
 
   try {
     let time = new Date();
-    time.setHours(time.getHours() - 1);
+    time.setHours(time.getHours() - 2);
     time.setSeconds(0, 0);
     const unixTime = Math.floor(time.getTime() - 1000)
       .toString()
@@ -31,28 +32,39 @@ export default async function handler(
       ZENDESK_AUTH_HEADER
     );
 
-    let articlesToRevalidate: ZendeskArticleTranslation[] = [];
-
-    for (let article of articles) {
-      const translations = await getArticleTranslations(
-        getZendeskUrl(),
-        article.id
-      );
-      for (let translation of translations) {
-        if (new Date(translation.updated_at) >= time) {
-          articlesToRevalidate.push(translation);
-        }
-      }
+    if (!articles.length) {
+      return res.status(200).json('nothing to revalidate');
     }
 
-    Promise.all(
-      articlesToRevalidate.map(async (article) => {
-        const pathToRevalidate = `/${article.locale}/articles/${article.source_id}`;
-        await res.revalidate(pathToRevalidate);
+    const result = await Promise.allSettled(
+      articles.map(async (article) => {
+        for (let lang in LOCALES) {
+          const pathToRevalidate = `/${LOCALES[lang].url}/articles/${article.id}`;
+          await res.revalidate(pathToRevalidate);
+        }
       })
     );
-    return res.status(200).json({ revalidated: true });
+
+    return res.status(200).json({
+      revalidated: true,
+      articles,
+      time,
+      status: handleResults(result),
+    });
   } catch (err) {
     return res.status(500).send('Error revalidating ' + err);
   }
+}
+
+const isFulfilled = <T>(
+  p: PromiseSettledResult<T>
+): p is PromiseFulfilledResult<T> => p.status === 'fulfilled';
+const isRejected = <T>(
+  p: PromiseSettledResult<T>
+): p is PromiseRejectedResult => p.status === 'rejected';
+
+function handleResults(results: PromiseSettledResult<void>[]) {
+  const errors = results.filter(isRejected);
+  const success = results.filter(isFulfilled);
+  return { errors, success };
 }
