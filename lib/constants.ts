@@ -47,6 +47,7 @@ export const CATEGORIES_TO_HIDE: number[] = [
 // Keep in sync with locales configured in /next.config.js.
 export const DYNAMIC_CONTENT_LOCALES: { [key: string]: number } = {
   'en-us': 1, // English locale id
+  ar: 66, // Arabic local id
   ps: 1348, // Pashto locale id
   fa: 1016, // Persian locale id
   fr: 16, // French locale id
