@@ -22,6 +22,7 @@
     "@ircsignpost/signpost-base": "14.44.0",
     "@next/env": "^12.2.4",
     "@react-spring/web": "^9.5.4",
+    "@vercel/og": "^0.5.10",
     "algoliasearch": "^4.14.2",
     "antd": "^4.23.1",
     "html-dom-parser": "^3.1.2",
