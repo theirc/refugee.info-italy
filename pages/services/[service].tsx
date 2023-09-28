@@ -1,24 +1,24 @@
+import { Auth, Directus, TypeMap } from '@directus/sdk';
 import { extractMetaTags } from '@ircsignpost/signpost-base/dist/src/article-content';
-import {
-  ArticlePageStrings,
-  getErrorResponseProps,
-} from '@ircsignpost/signpost-base/dist/src/article-page';
-import ArticlePage, {
-  MountArticle,
-} from '@ircsignpost/signpost-base/dist/src/article-page';
+import { getErrorResponseProps } from '@ircsignpost/signpost-base/dist/src/article-page';
 import CookieBanner from '@ircsignpost/signpost-base/dist/src/cookie-banner';
+import {
+  DirectusArticle,
+  getDirectusArticle,
+  getDirectusArticles,
+} from '@ircsignpost/signpost-base/dist/src/directus';
 import Footer from '@ircsignpost/signpost-base/dist/src/footer';
 import { MenuOverlayItem } from '@ircsignpost/signpost-base/dist/src/menu-overlay';
 import { createDefaultSearchBarProps } from '@ircsignpost/signpost-base/dist/src/search-bar';
+import { ServicePageStrings } from '@ircsignpost/signpost-base/dist/src/service-page';
+import ServicePage, {
+  MountService,
+} from '@ircsignpost/signpost-base/dist/src/service-page';
 import {
   CategoryWithSections,
   ZendeskCategory,
-  getCategoriesWithSections,
-} from '@ircsignpost/signpost-base/dist/src/zendesk';
-import {
-  getArticle,
-  getArticles,
   getCategories,
+  getCategoriesWithSections,
   getTranslationsFromDynamicContent,
 } from '@ircsignpost/signpost-base/dist/src/zendesk';
 import { GetStaticProps } from 'next';
@@ -27,11 +27,13 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import {
-  ABOUT_US_ARTICLE_ID,
   CATEGORIES_TO_HIDE,
   CATEGORY_ICON_NAMES,
+  DIRECTUS_AUTH_TOKEN,
+  DIRECTUS_COUNTRY_ID,
+  DIRECTUS_INSTANCE,
   GOOGLE_ANALYTICS_IDS,
-  MENU_CATEGORIES_TO_HIDE,
+  REVALIDATION_TIMEOUT_SECONDS,
   SEARCH_BAR_INDEX,
   SECTION_ICON_NAMES,
   SITE_TITLE,
@@ -51,55 +53,52 @@ import {
   COMMON_DYNAMIC_CONTENT_PLACEHOLDERS,
   ERROR_DYNAMIC_CONTENT_PLACEHOLDERS,
   generateArticleErrorProps,
-  populateArticlePageStrings,
   populateMenuOverlayStrings,
+  populateServicePageStrings,
 } from '../../lib/translations';
 import { getSiteUrl, getZendeskMappedUrl, getZendeskUrl } from '../../lib/url';
 
-interface ArticleProps {
+interface ServiceProps {
   pageTitle: string;
-  articleTitle: string;
-  articleContent: string;
-  metaTagAttributes: object[];
+  serviceId: number;
+  pageUnderConstruction?: boolean;
   siteUrl: string;
-  articleId: number;
+  preview: boolean;
+  metaTagAttributes: object[];
   lastEditedValue: string;
   locale: Locale;
-  pageUnderConstruction?: boolean;
-  preview: boolean;
-  strings: ArticlePageStrings;
-  // A list of |MenuOverlayItem|s to be displayed in the header and side menu.
+  strings: ServicePageStrings;
   menuOverlayItems: MenuOverlayItem[];
   footerLinks?: MenuOverlayItem[];
+  service: DirectusArticle;
 }
 
-export default function Article({
+export default function Service({
   pageTitle,
-  articleTitle,
-  articleId,
-  articleContent,
-  metaTagAttributes,
+  serviceId,
+  pageUnderConstruction,
   siteUrl,
+  preview,
+  metaTagAttributes,
   lastEditedValue,
   locale,
-  pageUnderConstruction,
-  preview,
   strings,
   menuOverlayItems,
   footerLinks,
-}: ArticleProps) {
+  service,
+}: ServiceProps) {
   const router = useRouter();
   const { publicRuntimeConfig } = getConfig();
 
   return (
-    <ArticlePage
+    <ServicePage
       pageTitle={pageTitle}
-      articleId={articleId}
+      serviceId={serviceId}
       canonicalLocales={LOCALE_CODES_TO_CANONICAL_LOCALE_CODES}
       pageUnderConstruction={pageUnderConstruction}
       siteUrl={siteUrl}
       preview={preview}
-      errorProps={strings.articleErrorStrings}
+      errorProps={strings.serviceErrorStrings}
       metaTagAttributes={metaTagAttributes}
       layoutWithMenuProps={{
         headerProps: {
@@ -133,61 +132,76 @@ export default function Article({
         children: [],
       }}
     >
-      <MountArticle
-        articleProps={{
-          title: articleTitle,
-          content: articleContent,
+      <MountService
+        serviceProps={{
+          service,
           lastEdit: {
             label: strings.lastUpdatedLabel,
             value: lastEditedValue,
             locale: locale,
           },
-          strings: strings.articleContentStrings,
+          disableShareButton: true,
+          strings: strings.serviceContentStrings,
         }}
       />
-    </ArticlePage>
+    </ServicePage>
   );
 }
 
 async function getStaticParams() {
-  const articles = await Promise.all(
-    Object.values(LOCALES).map(
-      async (locale) => await getArticles(locale, getZendeskUrl())
-    )
+  const directus: any = new Directus(DIRECTUS_INSTANCE);
+  await directus.auth.static(DIRECTUS_AUTH_TOKEN);
+  const services = await getDirectusArticles(DIRECTUS_COUNTRY_ID, directus);
+
+  // const services = await getServices(directus)
+
+  const allowedLanguageCodes = Object.values(LOCALES).map(
+    (locale) => locale.directus
   );
 
-  return articles
-    .flat()
-    .filter((x) => x?.author_id !== 423757401494)
-    .map((article) => {
+  const servicesFiltered = services?.filter((service) => {
+    const translation = service?.translations?.find((translation) =>
+      allowedLanguageCodes.includes(translation.languages_id.code)
+    );
+    return translation;
+  });
+
+  return servicesFiltered.flatMap((service) =>
+    service?.translations?.map((translation) => {
+      const locale = Object.values(LOCALES).find(
+        (x) => x.directus === translation.languages_id.code
+      );
+
       return {
-        article: article.id.toString(),
-        locale: article.locale,
+        service: service.id.toString(),
+        locale: locale?.url,
       };
-    });
+    })
+  );
 }
 
 export async function getStaticPaths() {
   const articleParams = await getStaticParams();
 
   return {
-    paths: articleParams.map(({ article, locale }) => {
+    paths: articleParams.map(({ service, locale }) => {
       return {
-        params: { article },
+        params: { service },
         locale,
       };
     }),
     fallback: 'blocking',
+    // fallback: false //Temporary patch to avoid some page errors! check later
   };
 }
 
-function getStringPath(article: string, locale: string): string {
-  return `/${locale}/articles/${article}`;
+function getStringPath(service: string, locale: string = 'en-us'): string {
+  return `/${locale}/services/${service}`;
 }
 
 export async function getStringPaths(): Promise<string[]> {
   const params = await getStaticParams();
-  return params.map((param) => getStringPath(param.article, param.locale));
+  return params.map((param) => getStringPath(param.service, param.locale));
 }
 
 export const getStaticProps: GetStaticProps = (async ({
@@ -207,7 +221,6 @@ export const getStaticProps: GetStaticProps = (async ({
   );
 
   let categories: ZendeskCategory[] | CategoryWithSections[];
-  let menuCategories: ZendeskCategory[] | CategoryWithSections[];
   if (USE_CAT_SEC_ART_CONTENT_STRUCTURE) {
     categories = await getCategoriesWithSections(
       currentLocale,
@@ -219,46 +232,39 @@ export const getStaticProps: GetStaticProps = (async ({
         (s) => (s.icon = SECTION_ICON_NAMES[s.id] || 'help_outline')
       );
     });
-    menuCategories = await getCategoriesWithSections(
-      currentLocale,
-      getZendeskUrl(),
-      (c) => !MENU_CATEGORIES_TO_HIDE.includes(c.id)
-    );
   } else {
     categories = await getCategories(currentLocale, getZendeskUrl());
     categories = categories.filter((c) => !CATEGORIES_TO_HIDE.includes(c.id));
     categories.forEach(
       (c) => (c.icon = CATEGORY_ICON_NAMES[c.id] || 'help_outline')
     );
-    menuCategories = await getCategories(currentLocale, getZendeskUrl());
-    menuCategories = menuCategories.filter(
-      (c) => !MENU_CATEGORIES_TO_HIDE.includes(c.id)
-    );
   }
 
   const menuOverlayItems = getMenuItems(
     populateMenuOverlayStrings(dynamicContent),
-    menuCategories
+    categories
   );
+
+  const strings = populateServicePageStrings(dynamicContent);
 
   const footerLinks = getFooterItems(
     populateMenuOverlayStrings(dynamicContent),
-    menuCategories
+    categories
   );
 
-  const strings = populateArticlePageStrings(dynamicContent);
+  const directus: any = new Directus(DIRECTUS_INSTANCE);
+  await directus.auth.static(DIRECTUS_AUTH_TOKEN);
 
-  const article = await getArticle(
-    currentLocale,
-    Number(params?.article),
-    getZendeskUrl(),
-    getZendeskMappedUrl(),
-    ZENDESK_AUTH_HEADER,
-    preview ?? false
+  const service = await getDirectusArticle(Number(params?.service), directus);
+
+  const serviceTranslated = service.translations.filter(
+    (x) => x.languages_id.code === currentLocale.directus
   );
+
+  service.translations = serviceTranslated;
 
   // If article does not exist, return an error.
-  if (!article) {
+  if (!service || !service.translations.length) {
     const errorProps = await getErrorResponseProps(
       Number(params?.article),
       currentLocale,
@@ -293,24 +299,27 @@ export const getStaticProps: GetStaticProps = (async ({
         };
   }
 
-  const [metaTagAttributes, content] = article.body
-    ? extractMetaTags(article.body)
-    : [[], article.body];
+  service.description = serviceTranslated[0].description;
+  service.name = serviceTranslated[0].name;
+
+  const [metaTagAttributes, content] = serviceTranslated[0].description
+    ? extractMetaTags(serviceTranslated[0].description)
+    : [[], serviceTranslated[0].description];
 
   return {
     props: {
-      pageTitle: `${article.title} - ${SITE_TITLE}`,
-      articleTitle: article.title,
-      articleId: article.id,
-      articleContent: content,
-      metaTagAttributes,
+      pageTitle: `${serviceTranslated[0].name} - ${SITE_TITLE}`,
+      serviceId: service.id,
       siteUrl: getSiteUrl(),
-      lastEditedValue: article.edited_at,
-      locale: currentLocale,
       preview: preview ?? false,
+      metaTagAttributes,
+      lastEditedValue: service.date_updated,
+      locale: currentLocale,
       strings,
       menuOverlayItems,
       footerLinks,
+      service,
     },
+    revalidate: REVALIDATION_TIMEOUT_SECONDS,
   };
 }) as any;

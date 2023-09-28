@@ -8,11 +8,13 @@ import { FooterStrings } from '@ircsignpost/signpost-base/dist/src/footer';
 import { HeaderBannerStrings } from '@ircsignpost/signpost-base/dist/src/header-banner';
 import { HomePageStrings } from '@ircsignpost/signpost-base/dist/src/home-page';
 import { CardsListStrings } from '@ircsignpost/signpost-base/dist/src/home-page-cards-list';
+import { PopupStrings } from '@ircsignpost/signpost-base/dist/src/map';
 import { SearchBarStrings } from '@ircsignpost/signpost-base/dist/src/search-bar';
 import { SearchResultsPageStrings } from '@ircsignpost/signpost-base/dist/src/search-results-page';
 import { SearchResultsStrings } from '@ircsignpost/signpost-base/dist/src/search-results-page-content';
 import { SectionStrings } from '@ircsignpost/signpost-base/dist/src/section-page';
 import { ServiceMapStrings } from '@ircsignpost/signpost-base/dist/src/service-map';
+import { ServicePageStrings } from '@ircsignpost/signpost-base/dist/src/service-page';
 import { ShareButtonStrings } from '@ircsignpost/signpost-base/dist/src/share-button';
 
 import { CustomMenuOverlayStrings } from './menu';
@@ -76,6 +78,13 @@ export const HOME_PAGE_DYNAMIC_CONTENT_PLACEHOLDERS = [
   'DEFAULT_SERVICE_MAP_ALL_CITIES_OPTION',
   'DEFAULT_SERVICE_MAP_ALL_CATEGORIES_OPTION',
   'default_service_map_my_location_option',
+  'default_all_services_type_option',
+  'default_all_providers_option',
+  'default_all_populations_option',
+  'default_all_accessibilities_option',
+  'default_distance_away_tooltip',
+  'default_contact_button_label',
+  'default_view_service_label',
 ];
 
 export const CATEGORY_PLACEHOLDERS = [
@@ -156,6 +165,15 @@ export function populateServiceMapStrings(dynamicContent: {
     allCategoriesOption:
       dynamicContent['DEFAULT_SERVICE_MAP_ALL_CATEGORIES_OPTION'],
     myLocationOption: dynamicContent['default_service_map_my_location_option'],
+    allServicesTypeOption: dynamicContent['default_all_services_type_option'],
+    allProvidersOption: dynamicContent['default_all_providers_option'],
+    allPopulationsOption: dynamicContent['default_all_populations_option'],
+    allAccessibilitiesOption:
+      dynamicContent['default_all_accessibilities_option'],
+    distanceAwayStrings: {
+      informationTooltip: dynamicContent['default_distance_away_tooltip'],
+    },
+    popupStrings: populatePopupStrings(dynamicContent),
   };
 }
 
@@ -353,5 +371,27 @@ export function populateFooterStrings(dynamicContent: {
 }): FooterStrings {
   return {
     disclaimerSummary: dynamicContent['default_home_disclaimer'],
+  };
+}
+
+export function populatePopupStrings(dynamicContent: {
+  [key: string]: string;
+}): PopupStrings {
+  return {
+    contactButtonLabel: dynamicContent['default_contact_button_label'],
+    viewServiceLabel: dynamicContent['default_view_service_label'],
+  };
+}
+
+export function populateServicePageStrings(dynamicContent: {
+  [key: string]: string;
+}): ServicePageStrings {
+  return {
+    serviceContentStrings: populateArticleContentStrings(dynamicContent),
+    searchBarStrings: populateSearchBarStrings(dynamicContent),
+    cookieBannerStrings: populateCookieBannerStrings(dynamicContent),
+    serviceErrorStrings: generateArticleErrorProps(dynamicContent),
+    lastUpdatedLabel: getLastUpdatedLabel(dynamicContent),
+    footerStrings: populateFooterStrings(dynamicContent),
   };
 }

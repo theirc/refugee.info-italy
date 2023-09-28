@@ -1,4 +1,12 @@
+import { Directus } from '@directus/sdk';
 import CookieBanner from '@ircsignpost/signpost-base/dist/src/cookie-banner';
+import {
+  getDirectusAccessibility,
+  getDirectusArticles,
+  getDirectusPopulationsServed,
+  getDirectusProviders,
+  getDirectusServiceCategories,
+} from '@ircsignpost/signpost-base/dist/src/directus';
 import { HeaderBannerStrings } from '@ircsignpost/signpost-base/dist/src/header-banner';
 import HomePage, {
   HomePageStrings,
@@ -6,16 +14,13 @@ import HomePage, {
 import { MenuOverlayItem } from '@ircsignpost/signpost-base/dist/src/menu-overlay';
 import { ServiceMapProps } from '@ircsignpost/signpost-base/dist/src/service-map';
 import {
-  fetchRegions,
-  fetchServices,
-  fetchServicesCategories,
-} from '@ircsignpost/signpost-base/dist/src/service-map-common';
-import {
   CategoryWithSections,
   ZendeskCategory,
+  getCategoriesWithSections,
+} from '@ircsignpost/signpost-base/dist/src/zendesk';
+import {
   getArticle,
   getCategories,
-  getCategoriesWithSections,
   getTranslationsFromDynamicContent,
 } from '@ircsignpost/signpost-base/dist/src/zendesk';
 import type { NextPage } from 'next';
@@ -26,9 +31,12 @@ import {
   ABOUT_US_ARTICLE_ID,
   CATEGORIES_TO_HIDE,
   CATEGORY_ICON_NAMES,
-  COUNTRY_ID,
+  DIRECTUS_AUTH_TOKEN,
+  DIRECTUS_COUNTRY_ID,
+  DIRECTUS_INSTANCE,
   GOOGLE_ANALYTICS_IDS,
   MAP_DEFAULT_COORDS,
+  MENU_CATEGORIES_TO_HIDE,
   REVALIDATION_TIMEOUT_SECONDS,
   SEARCH_BAR_INDEX,
   SECTION_ICON_NAMES,
@@ -55,6 +63,8 @@ import {
   populateSocialMediaLinks,
 } from '../lib/translations';
 import { getZendeskMappedUrl, getZendeskUrl } from '../lib/url';
+
+// import { cachedDirectus } from '../lib/cacheddirectus'
 
 interface HomeProps {
   currentLocale: Locale;
@@ -123,6 +133,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   );
 
   let categories: ZendeskCategory[] | CategoryWithSections[];
+  let menuCategories: ZendeskCategory[] | CategoryWithSections[];
   if (USE_CAT_SEC_ART_CONTENT_STRUCTURE) {
     categories = await getCategoriesWithSections(
       currentLocale,
@@ -134,48 +145,97 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
         (s) => (s.icon = SECTION_ICON_NAMES[s.id] || 'help_outline')
       );
     });
+    menuCategories = await getCategoriesWithSections(
+      currentLocale,
+      getZendeskUrl(),
+      (c) => !MENU_CATEGORIES_TO_HIDE.includes(c.id)
+    );
   } else {
     categories = await getCategories(currentLocale, getZendeskUrl());
     categories = categories.filter((c) => !CATEGORIES_TO_HIDE.includes(c.id));
     categories.forEach(
       (c) => (c.icon = CATEGORY_ICON_NAMES[c.id] || 'help_outline')
     );
+    menuCategories = await getCategories(currentLocale, getZendeskUrl());
+    menuCategories = menuCategories.filter(
+      (c) => !MENU_CATEGORIES_TO_HIDE.includes(c.id)
+    );
   }
 
-  const aboutUsArticle = await getArticle(
+  const menuOverlayItems = getMenuItems(
+    populateMenuOverlayStrings(dynamicContent),
+    menuCategories
+  );
+  const footerLinks = getFooterItems(
+    populateMenuOverlayStrings(dynamicContent),
+    menuCategories
+  );
+
+  const article = await getArticle(
     currentLocale,
     ABOUT_US_ARTICLE_ID,
     getZendeskUrl(),
     getZendeskMappedUrl(),
     ZENDESK_AUTH_HEADER
   );
-  const aboutUsTextHtml = aboutUsArticle ? aboutUsArticle.body : '';
-
-  const menuOverlayItems = getMenuItems(
-    populateMenuOverlayStrings(dynamicContent),
-    categories
-  );
-
-  const footerLinks = getFooterItems(
-    populateMenuOverlayStrings(dynamicContent),
-    categories
-  );
+  const aboutUsTextHtml = article ? article.body : '';
 
   const strings = populateHomePageStrings(dynamicContent);
 
-  let regions = await fetchRegions(COUNTRY_ID, currentLocale.url);
-  regions.sort((a, b) => a.name.normalize().localeCompare(b.name.normalize()));
+  const directus: any = new Directus(DIRECTUS_INSTANCE);
+  await directus.auth.static(DIRECTUS_AUTH_TOKEN);
 
-  const serviceCategories = await fetchServicesCategories(
-    COUNTRY_ID,
-    currentLocale.url
+  const services = await getDirectusArticles(
+    DIRECTUS_COUNTRY_ID,
+    directus,
+    currentLocale.directus
   );
-  serviceCategories.sort((a, b) =>
+
+  // const services = await cachedDirectus.articlesLocale(currentLocale.directus)
+
+  services?.sort((a, b) =>
     a.name.normalize().localeCompare(b.name.normalize())
   );
 
-  const services = await fetchServices(COUNTRY_ID, currentLocale.url);
-  services.sort((a, b) => a.name.normalize().localeCompare(b.name.normalize()));
+  for (let n = 0; n < services.length; n++) {
+    const s = services[n];
+    const {
+      Files,
+      contactEmail,
+      Physical_Location,
+      date_created,
+      date_updated,
+      contactTitle,
+      secondaryEmail,
+      contactLastName,
+      country,
+      form,
+      headerimage,
+      oldid,
+      secondaryLastName,
+      secondaryName,
+      secondaryPhone,
+      user_updated,
+      user_created,
+      status,
+      source,
+      secondaryTitle,
+      contactPhone,
+      contactName,
+      ...minified
+    } = s;
+    services[n] = minified as any;
+  }
+
+  const serviceTypes = await getDirectusServiceCategories(directus);
+  const providers = await getDirectusProviders(directus, DIRECTUS_COUNTRY_ID);
+  const populations = await getDirectusPopulationsServed(directus);
+  const accessibility = await getDirectusAccessibility(directus);
+
+  // const serviceTypes = await cachedDirectus.serviceCategories()
+  // const providers = await cachedDirectus.providers()
+  // const populations = await cachedDirectus.populationsServed()
+  // const accessibility = await cachedDirectus.accessibilities()
 
   return {
     props: {
@@ -185,11 +245,15 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
       headerBannerStrings: populateHeaderBannerStrings(dynamicContent),
       socialMediaLinks: populateSocialMediaLinks(dynamicContent),
       serviceMapProps: {
-        regions,
-        serviceCategories,
         services,
         defaultCoords: MAP_DEFAULT_COORDS,
         shareButton: getShareButtonStrings(dynamicContent),
+        serviceTypes,
+        providers,
+        populations,
+        accessibility,
+        showDirectus: true,
+        currentLocale,
       },
       categories,
       aboutUsTextHtml,

@@ -5,9 +5,7 @@ export const SITE_TITLE = 'Refugee.info Italy';
 
 export const COUNTRY_ID = 11;
 
-export const MAP_DEFAULT_COORDS: LatLngExpression = [
-  34.45830721078611, 65.09457416213823,
-];
+export const MAP_DEFAULT_COORDS: LatLngExpression = [42.504154, 12.646361];
 
 // Cache statically generated pages for 1 hour. The timeout was chosen
 // arbitrarily. Our website has static, non-urgent resources, so we probably do
@@ -41,6 +39,8 @@ export const SECTION_ICON_NAMES: { [key: string]: string } = {
 export const CATEGORIES_TO_HIDE: number[] = [
   5388415886487, 5388365977367, 5388415940887, 4421271418775, 4420351027479,
 ];
+
+export const MENU_CATEGORIES_TO_HIDE: number[] = [5388365977367, 5388415886487];
 
 // A map from a locale code to Zendesk locale id used for dynamic content translations.
 // https://developer.zendesk.com/api-reference/ticketing/account-configuration/locales/
@@ -85,3 +85,7 @@ export const SEARCH_RESULTS_PAGE_INDEX: AlgoliaSearchIndex = {
   publicApiKey: ALGOLIA_SEARCH_API_KEY,
   indexName: ALGOLIA_ARTICLE_INDEX_NAME,
 };
+
+export const DIRECTUS_AUTH_TOKEN = process.env.DIRECTUS_TOKEN ?? '';
+export const DIRECTUS_COUNTRY_ID = 3;
+export const DIRECTUS_INSTANCE = 'https://directus-irc.azurewebsites.net/';
