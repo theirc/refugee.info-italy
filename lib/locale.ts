@@ -7,12 +7,17 @@ export { Locale };
 
 // Keep LOCALES and 'getLocaleFromCode' in sync with locales configured in /next.config.js.
 export const LOCALES: { [key: string]: Locale } = {
-  'en-us': { url: 'en-us', direction: 'ltr', name: 'English' },
-  ar: { url: 'ar', direction: 'rtl', name: 'العربية' },
-  fa: { url: 'fa', direction: 'rtl', name: 'فارسی/ دری' },
-  fr: { url: 'fr', direction: 'ltr', name: 'Français' },
-  uk: { url: 'uk', direction: 'ltr', name: 'Українська' },
-  ps: { url: 'ps', direction: 'rtl', name: 'پښتو' },
+  'en-us': {
+    url: 'en-us',
+    direction: 'ltr',
+    name: 'English',
+    directus: 'en-US',
+  },
+  ar: { url: 'ar', direction: 'rtl', name: 'العربية', directus: 'ar-SA' },
+  fa: { url: 'fa', direction: 'rtl', name: 'فارسی/ دری', directus: 'fa-FA' },
+  fr: { url: 'fr', direction: 'ltr', name: 'Français', directus: 'fr-FR' },
+  uk: { url: 'uk', direction: 'ltr', name: 'Українська', directus: 'uk-UK' },
+  ps: { url: 'ps', direction: 'rtl', name: 'پښتو', directus: 'ps-PS' },
 };
 
 export const LOCALE_CODES_TO_CANONICAL_LOCALE_CODES: { [key: string]: string } =
