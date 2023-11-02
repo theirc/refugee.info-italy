@@ -6,7 +6,7 @@ function Document() {
       <Head>
         <meta
           name="google-site-verification"
-          content="U3l0SzfjfhFmlKGira5Y0FG817PAevu2bSicVF1Lpog"
+          content="BeEC90eQfMtahevj2cqiyQqF6oREYZcP5zlHnCgrQeE"
         />
         <script
           src="https://kit.fontawesome.com/027db3ea3f.js"
