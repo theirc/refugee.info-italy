@@ -262,7 +262,11 @@ export const getStaticProps: GetStaticProps = async ({
   service.translations = serviceTranslated;
 
   // If article does not exist, return an error.
-  if (!service || !service.translations.length) {
+  if (
+    !service ||
+    !service.translations.length ||
+    service?.country !== DIRECTUS_COUNTRY_ID
+  ) {
     const errorProps = await getErrorResponseProps(
       Number(params?.article),
       currentLocale,
