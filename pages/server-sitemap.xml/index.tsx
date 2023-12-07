@@ -7,6 +7,7 @@ import { getSiteUrl } from '../../lib/url';
 import * as article from '../articles/[article]';
 import * as category from '../categories/[category]';
 import * as section from '../sections/[section]';
+import * as service from '../services/[service]';
 
 export async function getServerSideProps(
   ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>
@@ -14,6 +15,7 @@ export async function getServerSideProps(
   const allPaths: string[] = await Promise.all([
     /* Put dynamic paths here and exclude them from next-sitemap.config.mjs */
     article.getStringPaths(),
+    service.getStringPaths(),
     category.getStringPaths(),
     section.getStringPaths(),
   ]).then((results: string[][]) => results.flat());

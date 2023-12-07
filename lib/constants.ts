@@ -67,6 +67,8 @@ export const GOOGLE_ANALYTICS_IDS = [
 // https://www.algolia.com/account/api-keys/
 export const ALGOLIA_SEARCH_APP_ID = 'BWATZIXLX6';
 export const ALGOLIA_SEARCH_API_KEY = '0d9093280e7b2bc2b6ca12ed4180fd0a';
+export const ALGOLIA_SEARCH_API_KEY_WRITE =
+  process.env.ALGOLIA_SEARCH_API_KEY_WRITE ?? '';
 
 // TODO: create Algolia indexes for Articles and Queries and replace the names here.
 // See README for more info on how to create indexes.
