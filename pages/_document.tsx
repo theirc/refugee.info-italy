@@ -23,6 +23,9 @@ function Document() {
           id="rs_req_Init"
           defer
         ></script>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon.png"></link>
+        <meta name="theme-color" content="#242629" />
         {/*
         TODO: get API Key from your Product manager, update src and uncomment the script.
         <script
