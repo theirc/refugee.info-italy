@@ -811,10 +811,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@ircsignpost/signpost-base@16.6.0":
-  version "16.6.0"
-  resolved "https://registry.yarnpkg.com/@ircsignpost/signpost-base/-/signpost-base-16.6.0.tgz#5004bba5aaa7af22ceb0e6b59425067971664389"
-  integrity sha512-Jkx8BJkdcXNsViJwD7HQKIkuFoYfJ44kmSecDOwz3smUSix3qVkKA9kcYa6ax0f1D5r2amsCG/CzJjScPE2F5g==
+"@ircsignpost/signpost-base@16.7.0":
+  version "16.7.0"
+  resolved "https://registry.yarnpkg.com/@ircsignpost/signpost-base/-/signpost-base-16.7.0.tgz#01bf4281c49198e369b7a3639ae5739c9a758d8d"
+  integrity sha512-hgahMub0yxWRecl3dWukZNwQYrPVPoEMLno73fxZFMi6PbnxECS4IUjfAv509C9EbvTYI3m6gWCGOoTTpNRhUg==
 
 "@jridgewell/gen-mapping@^0.1.0":
   version "0.1.1"
