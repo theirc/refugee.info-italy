@@ -183,10 +183,39 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
 
   services = []; // This is to hide the service-map
 
+  const uniqueAccessibilityIdsSet = new Set(
+    services.flatMap((x) =>
+      x.Accessibility.map(
+        (accessibilityItem) => accessibilityItem.accessibility_id
+      )
+    )
+  );
+  const uniqueAccessibilityIdsArray = Array.from(uniqueAccessibilityIdsSet);
+
+  const uniquePopulationsIdsSet = new Set(
+    services.flatMap((x) =>
+      x.Populations.map((population) => population.populations_id)
+    )
+  );
+  const uniquePopulationsIdsArray = Array.from(uniquePopulationsIdsSet);
+
+  const uniqueProvidersIdsSet = new Set(services.flatMap((x) => x.provider.id));
+  const uniqueProvidersIdsArray = Array.from(uniqueProvidersIdsSet);
+
   const serviceTypes = await getDirectusServiceCategories(directus);
-  const providers = await getDirectusProviders(directus, DIRECTUS_COUNTRY_ID);
-  const populations = await getDirectusPopulationsServed(directus);
-  const accessibility = await getDirectusAccessibility(directus);
+  const providers = await getDirectusProviders(
+    directus,
+    DIRECTUS_COUNTRY_ID,
+    uniqueProvidersIdsArray
+  );
+  const populations = await getDirectusPopulationsServed(
+    uniquePopulationsIdsArray,
+    directus
+  );
+  const accessibility = await getDirectusAccessibility(
+    uniqueAccessibilityIdsArray,
+    directus
+  );
 
   return {
     props: {
