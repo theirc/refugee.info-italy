@@ -288,6 +288,7 @@ export function populateMenuOverlayStrings(dynamicContent: {
     home: dynamicContent['default_menu_home_title'],
     information: dynamicContent['default_information_title'],
     about: dynamicContent['default_menu_about_title'],
+    services: dynamicContent['default_menu_services_title'],
   };
 }
 
