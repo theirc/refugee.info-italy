@@ -27,13 +27,14 @@ import Analytics from '@ircsignpost/signpost-base/dist/src/analytics';
 import { GOOGLE_ANALYTICS_IDS } from '../lib/constants';
 
 import type { AppProps } from 'next/app';
+import { BreadcrumbsProvider } from '../context/BreadcrumbsContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <BreadcrumbsProvider>
       <Analytics googleAnalyticsIds={GOOGLE_ANALYTICS_IDS}/>
       <Component {...pageProps} />
-    </>
+    </BreadcrumbsProvider>
   );
 }
 
