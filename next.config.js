@@ -33,6 +33,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'refugee-info-api.s3.amazonaws.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'directus-irc.azurewebsites.net',
+      },
     ],
   },
   publicRuntimeConfig: {
