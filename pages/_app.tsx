@@ -1,8 +1,8 @@
 import 'antd/dist/antd.less';
 import '../styles/globals.css';
-import 'leaflet/dist/leaflet.css';
-import "leaflet.markercluster/dist/MarkerCluster.css";
-import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "mapbox-gl/dist/mapbox-gl.css";
+import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import '@ircsignpost/signpost-base/styles/topic-with-articles.less';
 import '@ircsignpost/signpost-base/styles/footer-page.less';
 import '@ircsignpost/signpost-base/styles/header.less';
