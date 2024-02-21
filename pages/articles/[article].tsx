@@ -11,10 +11,12 @@ import Footer from '@ircsignpost/signpost-base/dist/src/footer';
 import { MenuOverlayItem } from '@ircsignpost/signpost-base/dist/src/menu-overlay';
 import { createDefaultSearchBarProps } from '@ircsignpost/signpost-base/dist/src/search-bar';
 import {
+  Attachment,
   CategoryWithSections,
   ZendeskCategory,
 } from '@ircsignpost/signpost-base/dist/src/zendesk';
 import {
+  fetchArticleAttachments,
   getArticle,
   getArticles,
   getCategories,
@@ -68,6 +70,7 @@ interface ArticleProps {
   pageUnderConstruction?: boolean;
   preview: boolean;
   strings: ArticlePageStrings;
+  attachments?: Attachment[];
   // A list of |MenuOverlayItem|s to be displayed in the header and side menu.
   menuOverlayItems: MenuOverlayItem[];
   footerLinks?: MenuOverlayItem[];
@@ -85,6 +88,7 @@ export default function Article({
   pageUnderConstruction,
   preview,
   strings,
+  attachments,
   menuOverlayItems,
   footerLinks,
 }: ArticleProps) {
@@ -145,6 +149,7 @@ export default function Article({
           },
           strings: strings.articleContentStrings,
           previosURL: breadcrumbs,
+          attachments,
         }}
       />
     </ArticlePage>
@@ -197,6 +202,8 @@ export const getStaticProps: GetStaticProps = async ({
   locale,
   preview,
 }) => {
+  const articleId = Number(params?.article);
+
   const currentLocale = getLocaleFromCode(locale ?? '');
   let dynamicContent = await getTranslationsFromDynamicContent(
     getZendeskLocaleId(currentLocale),
@@ -249,6 +256,13 @@ export const getStaticProps: GetStaticProps = async ({
     preview ?? false
   );
 
+  const attachments = await fetchArticleAttachments(articleId, getZendeskUrl());
+
+  const articleWithAttachments = {
+    ...article,
+    attachments,
+  };
+
   // If article does not exist, return an error.
   if (!article) {
     const errorProps = await getErrorResponseProps(
@@ -295,6 +309,7 @@ export const getStaticProps: GetStaticProps = async ({
       articleTitle: article.title,
       articleId: article.id,
       articleContent: content,
+      attachments: articleWithAttachments.attachments,
       metaTagAttributes,
       siteUrl: getSiteUrl(),
       lastEditedValue: article.edited_at,
