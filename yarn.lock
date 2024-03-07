@@ -1751,10 +1751,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@ircsignpost/signpost-base@16.32.0":
-  version "16.32.0"
-  resolved "https://registry.yarnpkg.com/@ircsignpost/signpost-base/-/signpost-base-16.32.0.tgz#8c5b22dabcb1484e7aea7da26acf02a153e326c6"
-  integrity sha512-jQ+RLCv7bW9MBYmrTE0qrjVFGHJkpaF3OdOjyPsNKnBwhh+olwcNy9kH66YhKrYnWVpk5oSg1ow+H/vymY/Vqg==
+"@ircsignpost/signpost-base@16.33.0":
+  version "16.33.0"
+  resolved "https://registry.yarnpkg.com/@ircsignpost/signpost-base/-/signpost-base-16.33.0.tgz#a9f8a3d2f3b91343550f3951cc6997a51d90b855"
+  integrity sha512-N8twh+KeaNGIiAEci3+xs6p6YN+J2Br6b3zf8rMe3ecuPDu38KL513vs/BSQdldPZ8pjiaWyXUCPxNxo9Y6Qdw==
 
 "@jridgewell/gen-mapping@^0.1.0":
   version "0.1.1"
