@@ -27,7 +27,7 @@ export function getFooterItems(
   items.push({
     key: 'about',
     label: strings.about,
-    href: `/articles/${ABOUT_US_ARTICLE_ID}`,
+    href: `/categories/5388415886487`,
   });
   return items;
 }
