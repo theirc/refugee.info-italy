@@ -32,7 +32,7 @@ export const SECTION_ICON_NAMES: { [key: string]: string } = {
 
 // A list of category IDs that the site should not display.
 export const CATEGORIES_TO_HIDE: number[] = [
-  5388415886487, 5388365977367, 5388415940887, 4421271418775, 4420351027479,
+  5388365977367, 5388415940887, 4421271418775, 4420351027479,
 ];
 
 // A map from a locale code to Zendesk locale id used for dynamic content translations.
