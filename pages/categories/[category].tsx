@@ -49,6 +49,7 @@ interface CategoryProps {
   pageTitle: string;
   categoryId: number;
   categoryItems: MenuItem[];
+  allCategoryItems: MenuItem[];
   sections: Section[];
   // A list of |MenuOverlayItem|s to be displayed in the header and side menu.
   menuOverlayItems: MenuOverlayItem[];
@@ -69,6 +70,7 @@ export default function Category({
   sectionFilterItems,
   dynamicContent,
   footerLinks,
+  allCategoryItems,
 }: CategoryProps) {
   const [sectionDisplayed, setSectionDisplayed] = useState<Section[]>(sections);
   const { publicRuntimeConfig } = getConfig();
@@ -94,10 +96,10 @@ export default function Category({
     const url = router.asPath;
     const test = {
       url,
-      title: categoryItems.filter((x) => x.value === categoryId)[0]?.name,
+      title: allCategoryItems.filter((x) => x.value === categoryId)[0]?.name,
     };
     setBreadcrumbs(test);
-  }, [categoryId, categoryItems, router.asPath, setBreadcrumbs]);
+  }, [categoryId, allCategoryItems, router.asPath, setBreadcrumbs]);
 
   return (
     <CategoryPage
@@ -122,6 +124,7 @@ export default function Category({
       sectionFilterItems={sectionFilterItems}
       onSectionFilterChange={handleSectionFilterChange}
       footerLinks={footerLinks}
+      allCategoryItems={allCategoryItems}
     />
   );
 }
@@ -194,11 +197,20 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
   );
   const strings: CategoryStrings = populateCategoryStrings(dynamicContent);
 
-  const categories = (
-    await getCategories(currentLocale, getZendeskUrl())
-  ).filter((c) => !CATEGORIES_TO_HIDE.includes(c.id));
+  const categories = await getCategories(currentLocale, getZendeskUrl());
 
-  const categoryItems = categories.map((category) => {
+  const categoryItems = categories
+    .filter((c) => !CATEGORIES_TO_HIDE.includes(c.id))
+    .map((category) => {
+      return {
+        name: category.name,
+        value: category.id,
+        iconName: CATEGORY_ICON_NAMES[category.id.toString()] || 'help_outline',
+        link: '/categories/' + category.id.toString(),
+      };
+    });
+
+  const allCategoryItems = categories.map((category) => {
     return {
       name: category.name,
       value: category.id,
@@ -236,6 +248,7 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
       currentLocale,
       pageTitle: SITE_TITLE,
       categoryId: Number(params?.category),
+      allCategoryItems,
       categoryItems,
       sections,
       menuOverlayItems,
