@@ -17,11 +17,16 @@ export const USE_CAT_SEC_ART_CONTENT_STRUCTURE = false;
 
 // A mapping from category ID to a Material icon for that category.
 export const CATEGORY_ICON_NAMES: { [key: string]: string } = {
-  '5388318701591': 'transfer_within_a_station',
-  '5388415912983': 'article',
-  '5388318703383': 'campaign',
-  '5388412050199': 'gpp_good',
-  '5388386272663': 'announcement',
+  '5388415912983': 'article',//Other_documents
+  '5388318703383': 'campaign',//rights
+  '5388412050199': 'gpp_good', //safety
+  '5388386272663': 'local_airport', //travel
+  '19443984133661': 'hail', //Arrival_to_Italy
+  '5388318701591': 'directions_walk', //Asylum&Dublin
+  '19444002045085': 'description', //Permesso_di_soggiorno
+  '19444074360093':'family_restroom', //FamilyReunification
+  '19444076626973': 'business_center', //Work
+  '19444158872733': 'announcement' , //Updates
 };
 
 // A mapping from section ID to a Material icon for that section.
