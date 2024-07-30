@@ -14,7 +14,7 @@ const config = {
   generateRobotsTxt: true,
   exclude: [
     '/*/articles/*',
-    '/*/services/*',
+    '/services',
     '/*/categories/*',
     '/*/sections/*',
     '/server-sitemap.xml',
